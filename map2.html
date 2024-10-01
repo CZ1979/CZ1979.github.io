@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OSM Karte mit hervorgehobenen Städten</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #mapid { height: 600px; width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="mapid"></div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Karte initialisieren
+        var map = L.map('mapid').setView([51.1657, 10.4515], 6); // Fokus auf Deutschland
+
+        // OSM Kacheln hinzufügen
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Liste der Städte, die eingefärbt werden sollen
+        var cities = {
+            "Frankfurt": "green",
+            "Berlin": "green",
+            "Hannover": "red",
+            "Wiesbaden": "red",
+            "München": "green",
+            "Ingolstadt": "red",
+            "Fulda": "green",
+            "Osnabrück": "red",
+            "Stuttgart": "green",
+            "Hamburg": "green",
+            "Bremen": "green"
+        };
+
+        // Funktion zum Laden der GeoJSON-Daten und Hervorheben der Städte
+        function loadGeoJson(url) {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    L.geoJSON(data, {
+                        style: function(feature) {
+                            // Finde die Stadt im cities-Objekt und setze die Farbe entsprechend
+                            var cityName = feature.properties.shapeName;
+                            var color = "gray";  // Standardfarbe, falls die Stadt nicht in der Liste ist
+
+                            // Prüfe, ob eine Stadt im Namen enthalten ist und setze die entsprechende Farbe
+                            for (var city in cities) {
+                                if (cityName.includes(city)) {
+                                    color = cities[city];
+                                    break;
+                                }
+                            }
+
+                            return {
+                                color: color,
+                                fillColor: color,
+                                fillOpacity: 0.5
+                            };
+                        }
+                    }).addTo(map);
+                })
+                .catch(error => console.error("Fehler beim Laden der GeoJSON-Datei:", error));
+        }
+
+        // Lade die GeoJSON-Datei
+        loadGeoJson("geoBoundaries-DEU-ADM3.geojson");
+    </script>
+</body>
+</html>
