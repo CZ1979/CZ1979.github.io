@@ -34,7 +34,9 @@
             "Osnabrück": "red",
             "Stuttgart": "green",
             "Hamburg": "green",
-            "Bremen": "green"
+            "Bremen": "green",
+            "Hanau": "red",
+            "Leipzig": "lila"
         };
 
         // Funktion zum Laden der GeoJSON-Daten und Hervorheben der Städte
@@ -46,7 +48,7 @@
                         style: function(feature) {
                             // Finde die Stadt im cities-Objekt und setze die Farbe entsprechend
                             var cityName = feature.properties.shapeName;
-                            var color = "gray";  // Standardfarbe, falls die Stadt nicht in der Liste ist
+                            var color = "lightgray";  // Standardfarbe, falls die Stadt nicht in der Liste ist
 
                             // Prüfe, ob eine Stadt im Namen enthalten ist und setze die entsprechende Farbe
                             for (var city in cities) {
@@ -59,7 +61,8 @@
                             return {
                                 color: color,
                                 fillColor: color,
-                                fillOpacity: 0.5
+                                fillOpacity: 0.5,
+                                weight: 1 // Dicke der Linien auf 1 Pixel setzen
                             };
                         }
                     }).addTo(map);
