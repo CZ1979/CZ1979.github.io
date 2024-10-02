@@ -22,41 +22,33 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Liste der Städte, die eingefärbt werden sollen
-        var cities = {
-            "Frankfurt": "green",
-            "Berlin": "green",
-            "Hannover": "red",
-            "Wiesbaden": "red",
-            "München": "green",
-            "Ingolstadt": "red",
-            "Fulda": "green",
-            "Osnabrück": "red",
-            "Stuttgart": "green",
-            "Hamburg": "green",
-            "Bremen": "green",
-            "Hanau": "red",
-            "Leipzig": "lila"
-        };
+        // Funktion zum Laden der JSON-Datei mit den Städten und Farben
+        function loadCities(url) {
+            fetch(url)
+                .then(response => response.json())
+                .then(cityData => {
+                    var cities = cityData.cities;  // Daten aus der cities.json Datei
+                    loadGeoJson('geoBoundaries-DEU-ADM3.geojson', cities);
+                })
+                .catch(error => console.error("Fehler beim Laden der Städte-Datei:", error));
+        }
 
         // Funktion zum Laden der GeoJSON-Daten und Hervorheben der Städte
-        function loadGeoJson(url) {
+        function loadGeoJson(url, cities) {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     L.geoJSON(data, {
                         style: function(feature) {
-                            // Finde die Stadt im cities-Objekt und setze die Farbe entsprechend
                             var cityName = feature.properties.shapeName;
                             var color = "white";  // Standardfarbe, falls die Stadt nicht in der Liste ist
 
                             // Prüfe, ob eine Stadt im Namen enthalten ist und setze die entsprechende Farbe
-                            for (var city in cities) {
-                                if (cityName.includes(city)) {
-                                    color = cities[city];
-                                    break;
+                            cities.forEach(function(city) {
+                                if (cityName.includes(city.name)) {
+                                    color = city.color;
                                 }
-                            }
+                            });
 
                             return {
                                 color: color,
@@ -70,8 +62,8 @@
                 .catch(error => console.error("Fehler beim Laden der GeoJSON-Datei:", error));
         }
 
-        // Lade die GeoJSON-Datei
-        loadGeoJson("geoBoundaries-DEU-ADM3.geojson");
+        // Lade die Städte und Farben aus der externen Datei
+        loadCities("cities.json");
     </script>
 </body>
 </html>
